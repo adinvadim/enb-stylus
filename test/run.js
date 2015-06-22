@@ -48,7 +48,7 @@ addSuite('cases', readDir(fixturesDirname + '/cases', '.styl'), function (test, 
     node.runTechAndGetContent(
         CssTech, {
             includes: ['images', 'cases/import.basic'],
-            comments: false,
+            infoComments: false,
             compress: test.indexOf('compress') !== -1,
             prefix: test.indexOf('prefix.') !== -1 && 'prefix-',
             hoist: test.indexOf('hoist.') !== -1,

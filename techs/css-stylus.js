@@ -29,20 +29,29 @@ module.exports = require('enb/lib/build-flow').create()
     .defineOption('compress', false)
     .defineOption('prefix', '')
     .defineOption('variables')
+    .defineOption('infoComments', true)
+    .defineOption('includes')
+    .defineOption('includeCSS', true)
     .useFileList(['css', 'styl'])
     .builder(function (sourceFiles) {
         var node = this.node,
             filename = node.resolvePath(path.basename(this._target)),
             defer = vow.defer(),
+            infoComments = this._infoComments,
             css, renderer;
 
         css = sourceFiles.map(function (file) {
             var url = node.relativePath(file.fullname);
 
             if (file.name.indexOf('.styl') !== -1) {
-                return '/* ' + url + ':begin */\n' +
-                    '@import "' + url + '";\n' +
-                    '/* ' + url + ':end */\n';
+                var pre = post = '';
+
+                if (infoComments === true) {
+                    pre = '/* ' + url + ':begin */\n';
+                    post = '/* ' + url + ':end */\n';
+                }
+
+                return pre + '@import "' + url + '";\n' + post;
             } else {
                 return '@import "' + url + '";';
             }
@@ -52,15 +61,22 @@ module.exports = require('enb/lib/build-flow').create()
                 compress: this._compress,
                 prefix: this._prefix
             })
+            .set('include css', this._includeCSS)
             .set('resolve url', true)
             .set('filename', filename)
-            .define('url', stylus.resolver());
+            .define('url', stylus.url());
 
         if (this._variables) {
             var variables = this._variables;
 
             Object.keys(variables).forEach(function (key) {
                 renderer.define(key, variables[key]);
+            });
+        }
+
+        if (this._includes) {
+            this._includes.forEach(function (path) {
+                renderer.include(path);
             });
         }
 
@@ -79,8 +95,14 @@ module.exports = require('enb/lib/build-flow').create()
                     .use(atImport({
                         transform: function (content, filename) {
                             var url = node.relativePath(filename),
-                                pre = '/* ' + url + ': begin */ /**/\n',
-                                post = '/* ' + url + ': end */ /**/\n',
+                                pre = post = '',
+                                res;
+
+                                if (infoComments === true) {
+                                    pre = '/* ' + url + ': begin */ /**/\n';
+                                    post = '/* ' + url + ': end */ /**/\n';
+                                }
+
                                 res = pre + content + post;
 
                             return res.replace(/\n/g, '\n    ');
