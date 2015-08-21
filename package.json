@@ -46,10 +46,12 @@
   "dependencies": {
     "autoprefixer-core": "5.2.1",
     "csswring": "3.0.5",
+    "jeet": "^6.1.2",
     "nib": "1.1.0",
     "postcss": "4.1.16",
     "postcss-import": "6.2.0",
     "postcss-url": "4.0.1",
+    "rupture": "^0.6.1",
     "stylus": "0.52.0",
     "vow": "0.4.10"
   },

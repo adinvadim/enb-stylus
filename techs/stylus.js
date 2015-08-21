@@ -7,6 +7,8 @@ var path = require('path'),
     stylus = require('stylus'),
     autoprefixer = require('autoprefixer-core'),
     nib = require('nib'),
+	jeet = require('jeet'),
+	rupture = require('rupture'),
     EOL = require('os').EOL,
     csswring = require('csswring');
 
@@ -101,6 +103,8 @@ module.exports = require('enb/lib/build-flow').create()
     .defineOption('prefix', '')
     .defineOption('includes', [])
     .defineOption('useNib', false)
+    .defineOption('useJeet', false)
+    .defineOption('useRupture', false)
     .useFileList(['styl', 'css'])
     .builder(function (sourceFiles) {
         var node = this.node,
@@ -236,6 +240,16 @@ module.exports = require('enb/lib/build-flow').create()
                 renderer
                     .use(nib())
                     .import(nib.path + '/nib');
+            }
+
+            if (this._useRupture) {
+                renderer
+                    .use(rupture());
+            }
+
+            if (this._useJeet) {
+                renderer
+                    .use(jeet());
             }
 
             var defer = vow.defer();
